@@ -1,16 +1,38 @@
-# React + Vite
+# 📰 Falando de Fato — Verificador de Notícias com IA (Lupita)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+O **Falando de Fato** é uma plataforma desenvolvida para auxiliar usuários a verificarem a veracidade de notícias, textos e informações circulando na internet.  
+O sistema conta com a **Lupita**, uma agente de IA que analisa a notícia enviada e retorna:
 
-Currently, two official plugins are available:
+- ✔ Classificação (verdadeiro, falso ou duvidoso)  
+- 📝 Resumo da análise  
+- 🔗 Possível fonte  
+- 📅 Data da notícia (quando identificada)  
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 🚀 Tecnologias utilizadas
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React.js** — interface do usuário  
+- **Vite** — ambiente de desenvolvimento rápido  
+- **JavaScript (ES6+)**  
+- **CSS3**  
+- **Backend em Python/FastAPI** (quando não está em modo mock)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 📌 Funcionalidades
+
+- Criação automática de conversas para cada verificação  
+- Histórico de verificações  
+- Chat com troca de mensagens entre usuário e IA  
+- Interface responsiva  
+- Mock interno para testes sem usar o backend  
+- Persistência via LocalStorage (quando mock ativado)
+
+---
+
+## 🛠 Como executar o projeto
+
+```sh
+npm install
+npm run dev
