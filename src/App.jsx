@@ -1,3 +1,5 @@
+/* App.jsx */
+
 // Importa React e hooks que serão usados no componente
 import React, { useEffect, useRef, useState } from "react";
 // Importa o componente Aside (barra lateral)
@@ -14,11 +16,11 @@ import { gerarId } from "./utils/chatUtils";
 import "./App.css";
 
 // URL base do backend (onde está o endpoint de verificação)
-const URL_BASE = "http://0.0.0.0:8000";
-/* const URL_BASE = "http://127.0.0.1:8000" */
+/* const URL_BASE = "http://0.0.0.0:8000"; */
+const URL_BASE = "http://localhost:8000"
 
 // Flag para usar mock de conversas (frontend-only) ou o backend real
-const USAR_MOCK_CONVERSAS = true;
+const USAR_MOCK_CONVERSAS = false;
 
 // Componente principal da aplicação
 export default function App() {
@@ -64,6 +66,35 @@ export default function App() {
     }
     // executa só uma vez ao montar (array de dependências vazio)
   }, []);
+
+  // No seu App.jsx, adicione este useEffect:
+useEffect(() => {
+  // Testa conexão com o backend ao carregar o app
+  if (!USAR_MOCK_CONVERSAS) {
+    console.log("🔌 Testando conexão com o backend...");
+    
+    fetch(`${URL_BASE}/`, { mode: 'cors' })
+      .then(response => {
+        console.log("✅ Backend respondendo em:", URL_BASE);
+        console.log("Status:", response.status);
+      })
+      .catch(error => {
+        console.error("❌ Backend OFFLINE ou erro CORS:", error);
+        
+        // Adiciona mensagem de erro na conversa inicial
+        setTimeout(() => {
+          adicionarMensagemNaConversaAtual(
+            "assistant",
+            <div className="erro-resposta">
+              <p>⚠️ <strong>Servidor offline</strong></p>
+              <p>O backend não está respondendo em {URL_BASE}</p>
+              <p>Verifique se o servidor Python está rodando.</p>
+            </div>
+          );
+        }, 1000);
+      });
+  }
+}, []);
 
   // --- Função para criar nova conversa (mock ou apenas frontend) ---
   async function criarNovaConversa(titulo = "Nova Verificação") {
@@ -130,32 +161,69 @@ export default function App() {
     // MODO BACKEND REAL
     // ======================
     try {
+
+      console.log("📤 Enviando para o backend:", texto);
       // chama o endpoint /verificar do backend enviando o texto/ prompt
       const res = await fetch(`${URL_BASE}/verificar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", 
+          "Accept": "application/json"
+         },
         body: JSON.stringify({ prompt: texto }),
+        mode: "cors"
       });
 
+       console.log("📥 Status da resposta:", res.status);
+
+       // Verifica se a resposta é OK
+    if (!res.ok) {
+      throw new Error(`Erro ${res.status}: ${res.statusText}`);
+    }
+
       const data = await res.json(); // parse do JSON retornado
+      console.log("✅ Dados recebidos do backend:", data);
 
       // monta uma resposta formatada a partir dos campos retornados
-      const respostaFormatada =
-        `Classificação: ${data.classificacao || "—"}\n\n` +
-        `Resumo: ${data.resumo || "—"}\n\n` +
-        `Fonte: ${data.fonte || "—"}\n\n` +
-        `Data da notícia: ${data.dataNoticia || "—"}`;
+      const respostaFormatada = (
+        <div className="lupita-resposta">
+          <p className="lupita-resposta__classificacao">
+            <strong>Classificação:</strong> {data.classificacao }
+          </p>
+          <p className="lupita-resposta__resumo">
+            <strong>Resumo:</strong> {data.resumo }
+          </p>
+          <p className="lupita-resposta__fonte">
+            <strong>Fonte:</strong> {data.fonte }
+          </p>
+          <p className="lupita-resposta__data">
+            <strong>Data da notícia:</strong> {data.dataNoticia }
+          </p>
+        </div>
+      );
 
       // adiciona a resposta da Lupita na conversa
       adicionarMensagemNaConversaAtual("assistant", respostaFormatada);
     } catch (error) {
-      // em caso de erro na requisição, avisa o usuário pela conversa
-      adicionarMensagemNaConversaAtual(
-        "assistant",
-        "Erro ao conectar com o servidor. Tente novamente."
-      );
-    }
+    console.error("❌ Erro na requisição:", error);
+    
+    // Mensagem de erro mais informativa
+    const mensagemErro = (
+      <div className="erro-resposta">
+        <p>⚠️ <strong>Erro ao verificar notícia:</strong></p>
+        <p>{error.message}</p>
+        <p className="dica-erro">
+          <small>
+            Verifique se:<br/>
+            1. O servidor está rodando em {URL_BASE}<br/>
+            2. Não há erros no console do backend
+          </small>
+        </p>
+      </div>
+    );
+
+    adicionarMensagemNaConversaAtual("assistant", mensagemErro);
   }
+}
 
   // pega o objeto da conversa atualmente selecionada (ou null)
   const conversaAtual =
@@ -199,3 +267,4 @@ export default function App() {
     </div>
   );
 }
+

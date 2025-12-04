@@ -485,3 +485,46 @@ textarea{
   background: rgba(0, 0, 0, 0.08);
   border-radius: 8px;
 }
+
+/* Estilo da resposta da Lupita */
+
+ /* container com classe única pra evitar override */
+.lupita-resposta {
+  display: block;
+  max-width: 560px;        /* ajuste conforme o chat */
+  background: #ece9fb;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  word-wrap: break-word;   /* garante quebra de palavras longas */
+  word-break: break-word;
+  white-space: normal;     /* importante: evita quebras estranhas */
+  line-height: 1.35;
+  margin-bottom: 18px;
+}
+
+/* cada linha fica em bloco separado */
+.lupita-resposta p {
+  display: block;          /* evita regras que forcem inline */
+  margin: 0 0 8px 0;
+  padding: 0;
+  font-size: 16px;
+  color: #222;
+}
+
+/* destaque do label (Classificação / Resumo) */
+.lupita-resposta p strong {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* caso o resumo seja longo, limitar a altura opcionalmente */
+.lupita-resposta__resumo {
+  white-space: pre-wrap;   /* mantém quebras \n, se o texto trouxer */
+  overflow-wrap: anywhere; /* quebre onde necessário */
+}
+
+/* pequenas variantes */
+.lupita-resposta__classificacao strong { color: #333; }
+.lupita-resposta__fonte { font-style: italic; color: #333; opacity: .95; }
+.lupita-resposta__data { opacity: .75; font-size: 13px; margin-top: 6px; }

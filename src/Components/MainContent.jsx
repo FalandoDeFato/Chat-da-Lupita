@@ -1,3 +1,5 @@
+/* == MainContent == */
+
 // Importa imagens usadas nos balões de conversa e no botão de envio
 import lupita from "../img/lupita.png";
 import iconeUsuario from "../img/iconeUsuario.png";
