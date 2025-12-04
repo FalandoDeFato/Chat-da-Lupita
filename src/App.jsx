@@ -3,13 +3,13 @@
 // Importa React e hooks que serão usados no componente
 import React, { useEffect, useRef, useState } from "react";
 // Importa o componente Aside (barra lateral)
-import Aside from "./components/SideBar.jsx";
+import Aside from "./Components/SideBar.jsx";
 // Importa a imagem do logo de check
 import CheckLogo from "./img/CheckLogo.png";
 // Importa o componente que rende o conteúdo principal do chat
-import MainContent from "./components/MainContent";
+import MainContent from "./Components/MainContent";
 // Importa o botão flutuante (que abre/fecha o aside)
-import FloatingButton from "./components/Button";
+import FloatingButton from "./Components/Button";
 // Função utilitária para gerar IDs únicos para conversas
 import { gerarId } from "./utils/chatUtils";
 // Importa estilos CSS do app
