@@ -16,8 +16,8 @@ import { gerarId } from "./utils/chatUtils";
 import "./App.css";
 
 // URL base do backend (onde está o endpoint de verificação)
-const URL_BASE = "http://localhost:8000"; 
-/* const URL_BASE = "falando-de-fato-backend-production.up.railway.app" */
+/* const URL_BASE = "http://localhost:8000";  */
+const URL_BASE = "https://falando-de-fato-backend-production.up.railway.app"
 
 // Flag para usar mock de conversas (frontend-only) ou o backend real
 const USAR_MOCK_CONVERSAS = false;
