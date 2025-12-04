@@ -3,7 +3,7 @@
 // Importa React e hooks que serão usados no componente
 import React, { useEffect, useRef, useState } from "react";
 // Importa o componente Aside (barra lateral)
-import Aside from "./components/SideBar";
+import Aside from "./components/SideBar.jsx";
 // Importa a imagem do logo de check
 import CheckLogo from "./img/CheckLogo.png";
 // Importa o componente que rende o conteúdo principal do chat
@@ -16,8 +16,8 @@ import { gerarId } from "./utils/chatUtils";
 import "./App.css";
 
 // URL base do backend (onde está o endpoint de verificação)
-/* const URL_BASE = "http://0.0.0.0:8000"; */
-const URL_BASE = "http://localhost:8000"
+const URL_BASE = "http://localhost:8000"; 
+/* const URL_BASE = "falando-de-fato-backend-production.up.railway.app" */
 
 // Flag para usar mock de conversas (frontend-only) ou o backend real
 const USAR_MOCK_CONVERSAS = false;
