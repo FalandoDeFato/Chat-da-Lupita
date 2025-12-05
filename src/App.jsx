@@ -31,7 +31,18 @@ export default function App() {
   // id da conversa atualmente selecionada
   const [conversaSelecionadaId, setConversaSelecionadaId] = useState(null);
   // controla se o menu lateral está aberto ou fechado
-  const [menuAberto, setMenuAberto] = useState(true);
+
+  // controla se o menu lateral está aberto ou fechado
+  const [menuAberto, setMenuAberto] = useState(() => {
+    if (typeof window === "undefined") return true; // segurança p/ build
+    return window.innerWidth > 768; // desktop abre, celular fecha
+  });
+
+  // 👇 NOVO: estado pra saber se está em modo mobile
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth <= 768;
+  });
 
   // --- Helpers para persistência local (somente usados no mock) ---
   // Salva o array de conversas no localStorage quando estamos em modo mock
@@ -45,6 +56,23 @@ export default function App() {
     const raw = localStorage.getItem("fd_conversas");
     return raw ? JSON.parse(raw) : null; // retorna null se não existir
   }
+
+  /* NOVOOOOO */
+  useEffect(() => {
+    function aoRedimensionar() {
+      if (window.innerWidth <= 768) {
+        setMenuAberto(false);    // fecha menu no celular
+      } else {
+        setMenuAberto(true);     // desktop sempre aberto
+      }
+    }
+
+    aoRedimensionar(); // roda ao abrir o app
+    window.addEventListener("resize", aoRedimensionar);
+
+    return () => window.removeEventListener("resize", aoRedimensionar);
+  }, []);
+
 
   // --- Carregar histórico quando o app monta ---
   useEffect(() => {
@@ -68,33 +96,53 @@ export default function App() {
   }, []);
 
   // No seu App.jsx, adicione este useEffect:
-useEffect(() => {
-  // Testa conexão com o backend ao carregar o app
-  if (!USAR_MOCK_CONVERSAS) {
-    console.log("🔌 Testando conexão com o backend...");
-    
-    fetch(`${URL_BASE}/`, { mode: 'cors' })
-      .then(response => {
-        console.log("✅ Backend respondendo em:", URL_BASE);
-        console.log("Status:", response.status);
-      })
-      .catch(error => {
-        console.error("❌ Backend OFFLINE ou erro CORS:", error);
-        
-        // Adiciona mensagem de erro na conversa inicial
-        setTimeout(() => {
-          adicionarMensagemNaConversaAtual(
-            "assistant",
-            <div className="erro-resposta">
-              <p>⚠️ <strong>Servidor offline</strong></p>
-              <p>O backend não está respondendo em {URL_BASE}</p>
-              <p>Verifique se o servidor Python está rodando.</p>
-            </div>
-          );
-        }, 1000);
-      });
-  }
-}, []);
+  useEffect(() => {
+    // Testa conexão com o backend ao carregar o app
+    if (!USAR_MOCK_CONVERSAS) {
+      console.log("🔌 Testando conexão com o backend...");
+
+      fetch(`${URL_BASE}/`, { mode: 'cors' })
+        .then(response => {
+          console.log("✅ Backend respondendo em:", URL_BASE);
+          console.log("Status:", response.status);
+        })
+        .catch(error => {
+          console.error("❌ Backend OFFLINE ou erro CORS:", error);
+
+          // Adiciona mensagem de erro na conversa inicial
+          setTimeout(() => {
+            adicionarMensagemNaConversaAtual(
+              "assistant",
+              <div className="erro-resposta">
+                <p>⚠️ <strong>Servidor offline</strong></p>
+                <p>O backend não está respondendo em {URL_BASE}</p>
+                <p>Verifique se o servidor Python está rodando.</p>
+              </div>
+            );
+          }, 1000);
+        });
+    }
+  }, []);
+
+  // Atualiza isMobile quando a tela for redimensionada
+  useEffect(() => {
+    function handleResize() {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+
+      // se virou mobile, fecha o menu
+      if (mobile) {
+        setMenuAberto(false);
+      } else {
+        setMenuAberto(true);
+      }
+    }
+
+    handleResize(); // roda na primeira vez
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   // --- Função para criar nova conversa (mock ou apenas frontend) ---
   async function criarNovaConversa(titulo = "Nova Verificação") {
@@ -166,19 +214,20 @@ useEffect(() => {
       // chama o endpoint /verificar do backend enviando o texto/ prompt
       const res = await fetch(`${URL_BASE}/verificar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", 
+        headers: {
+          "Content-Type": "application/json",
           "Accept": "application/json"
-         },
+        },
         body: JSON.stringify({ prompt: texto }),
         mode: "cors"
       });
 
-       console.log("📥 Status da resposta:", res.status);
+      console.log("📥 Status da resposta:", res.status);
 
-       // Verifica se a resposta é OK
-    if (!res.ok) {
-      throw new Error(`Erro ${res.status}: ${res.statusText}`);
-    }
+      // Verifica se a resposta é OK
+      if (!res.ok) {
+        throw new Error(`Erro ${res.status}: ${res.statusText}`);
+      }
 
       const data = await res.json(); // parse do JSON retornado
       console.log("✅ Dados recebidos do backend:", data);
@@ -187,16 +236,16 @@ useEffect(() => {
       const respostaFormatada = (
         <div className="lupita-resposta">
           <p className="lupita-resposta__classificacao">
-            <strong>Classificação:</strong> {data.classificacao }
+            <strong>Classificação:</strong> {data.classificacao}
           </p>
           <p className="lupita-resposta__resumo">
-            <strong>Resumo:</strong> {data.resumo }
+            <strong>Resumo:</strong> {data.resumo}
           </p>
           <p className="lupita-resposta__fonte">
-            <strong>Fonte:</strong> {data.fonte }
+            <strong>Fonte:</strong> {data.fonte}
           </p>
           <p className="lupita-resposta__data">
-            <strong>Data da notícia:</strong> {data.dataNoticia }
+            <strong>Data da notícia:</strong> {data.dataNoticia}
           </p>
         </div>
       );
@@ -204,26 +253,26 @@ useEffect(() => {
       // adiciona a resposta da Lupita na conversa
       adicionarMensagemNaConversaAtual("assistant", respostaFormatada);
     } catch (error) {
-    console.error("❌ Erro na requisição:", error);
-    
-    // Mensagem de erro mais informativa
-    const mensagemErro = (
-      <div className="erro-resposta">
-        <p>⚠️ <strong>Erro ao verificar notícia:</strong></p>
-        <p>{error.message}</p>
-        <p className="dica-erro">
-          <small>
-            Verifique se:<br/>
-            1. O servidor está rodando em {URL_BASE}<br/>
-            2. Não há erros no console do backend
-          </small>
-        </p>
-      </div>
-    );
+      console.error("❌ Erro na requisição:", error);
 
-    adicionarMensagemNaConversaAtual("assistant", mensagemErro);
+      // Mensagem de erro mais informativa
+      const mensagemErro = (
+        <div className="erro-resposta">
+          <p>⚠️ <strong>Erro ao verificar notícia:</strong></p>
+          <p>{error.message}</p>
+          <p className="dica-erro">
+            <small>
+              Verifique se:<br />
+              1. O servidor está rodando em {URL_BASE}<br />
+              2. Não há erros no console do backend
+            </small>
+          </p>
+        </div>
+      );
+
+      adicionarMensagemNaConversaAtual("assistant", mensagemErro);
+    }
   }
-}
 
   // pega o objeto da conversa atualmente selecionada (ou null)
   const conversaAtual =
@@ -232,7 +281,11 @@ useEffect(() => {
   // --- JSX retornado pelo componente ---
   return (
     // container principal; adiciona classe para estilizar quando a sidebar estiver fechada
-    <div className={`app ${menuAberto ? "" : "sidebar-fechada"}`}>
+    <div
+      className={`app ${menuAberto ? "" : "sidebar-fechada"} ${menuAberto && isMobile ? "menu-aberto-mobile" : ""
+        }`}
+    >
+
       {/* Aside (barra lateral) recebe props para listar conversas e controlar abertura */}
       <Aside
         conversas={conversas}
@@ -240,11 +293,27 @@ useEffect(() => {
         onSelect={(id) => setConversaSelecionadaId(id)}
         onNova={(titulo) => criarNovaConversa(titulo)}
         aberto={menuAberto}
-        toggle={() => setMenuAberto((v) => !v)}
+        toggle={() => {
+          // se abrir no desktop, abre normalmente
+          if (window.innerWidth > 768) return setMenuAberto(v => !v);
+
+          // se for celular, fecha sempre
+          setMenuAberto(false);
+        }}
+
       />
 
       <div className="main">
         <header className="topbar">
+          {/* botão de menu (só vai aparecer no mobile via CSS) */}
+          <button
+            className="btn-menu-mobile"
+            onClick={() => setMenuAberto((v) => !v)}
+            aria-label="Abrir menu lateral"
+          >
+            ☰
+          </button>
+
           <div className="logo">
             {/* logo de check */}
             <img src={CheckLogo} alt="Logo" />
@@ -262,8 +331,22 @@ useEffect(() => {
         />
       </div>
 
-      {/* Botão flutuante para abrir o aside quando em telas menores */}
-      <FloatingButton aberto={menuAberto} onAbrir={() => setMenuAberto(true)} />
+      {/* NOVOOOOOOO */}
+      {/* Mostrar botão flutuante somente se:
+    - está no mobile
+    - e menu está fechado */}
+      {window.innerWidth <= 768 && !menuAberto && (
+        <FloatingButton onAbrir={() => setMenuAberto(true)} />
+      )}
+
+      {/* BACKDROP — escurece a tela quando o menu está aberto no mobile */}
+      {isMobile && menuAberto && (
+        <div
+          className="backdrop-menu"
+          onClick={() => setMenuAberto(false)} // clicou no fundo → fecha menu
+        />
+      )}
+
     </div>
   );
 }

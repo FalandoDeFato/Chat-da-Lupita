@@ -474,6 +474,7 @@ textarea{
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  display: none !important;
 }
 
 /* pequenas melhorias (scrollbar) */
@@ -528,3 +529,59 @@ textarea{
 .lupita-resposta__classificacao strong { color: #333; }
 .lupita-resposta__fonte { font-style: italic; color: #333; opacity: .95; }
 .lupita-resposta__data { opacity: .75; font-size: 13px; margin-top: 6px; }
+
+/* Overlay que escurece o chat quando o menu está aberto no mobile */
+.backdrop-menu {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.45); /* nível de escuro, pode ajustar */
+  z-index: 500;
+}
+
+/* Garante que a sidebar fique acima do overlay */
+.sidebar {
+  position: relative;
+  z-index: 1000;
+}
+
+/* Só no mobile */
+@media (min-width: 769px) {
+  .backdrop-menu {
+    display: none;
+  }
+}
+
+
+
+.btn-menu-mobile {
+  display: none ;          /* some no desktop */
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  cursor: pointer;
+  margin-right: 12px;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
+/* no mobile aparece */
+@media (max-width: 768px) {
+  .btn-menu-mobile {
+    display: block;
+  }
+
+  .sidebar.fechada {
+    left: -260px; /* ou o que você já colocou pra esconder */
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    transition: left 0.3s ease;
+    z-index: 1000;
+  }
+}

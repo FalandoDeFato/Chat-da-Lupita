@@ -1,3 +1,5 @@
+/* SideBar.jsx */
+
 // Importa o ícone usado ao lado de cada conversa na lista
 import iconeBalao from "../img/iconBalao.png";
 // Importa React

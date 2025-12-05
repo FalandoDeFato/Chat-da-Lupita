@@ -1,3 +1,5 @@
+/* Button.jsx */
+
 // Importa o React (necessário para componentes funcionais)
 import React from "react";
 
