@@ -266,6 +266,8 @@ body {
 
 .chat-content.usuario {
   justify-content: flex-end;
+  margin-top: 12px;
+  margin-bottom: 12px;
 }
 
 .chat-content.usuario .balao-chat {
@@ -529,6 +531,37 @@ textarea{
 .lupita-resposta__classificacao strong { color: #333; }
 .lupita-resposta__fonte { font-style: italic; color: #333; opacity: .95; }
 .lupita-resposta__data { opacity: .75; font-size: 13px; margin-top: 6px; }
+
+/* Animação loading */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+  align-items: center;
+}
+
+.typing-indicator span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #555;
+  animation: blink 1.4s infinite both;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%   { opacity: 0.2; transform: translateY(0); }
+  20%  { opacity: 1;   transform: translateY(-2px); }
+  100% { opacity: 0.2; transform: translateY(0); }
+}
+
 
 /* Overlay que escurece o chat quando o menu está aberto no mobile */
 .backdrop-menu {

@@ -15,7 +15,7 @@ import React, { useEffect, useRef } from "react";
     - onEnviar: função chamada quando o usuário envia uma mensagem
     - campoRef: referência para o textarea, passada pelo componente pai
 */
-export default function MainContent({ conversa, onEnviar, campoRef }) {
+export default function MainContent({ conversa, onEnviar, campoRef, carregando }) {
   // Referência para o elemento <main> que contém as mensagens
   const mainRef = useRef(null);
 
@@ -72,6 +72,18 @@ export default function MainContent({ conversa, onEnviar, campoRef }) {
             {msg.role === "user" && <img src={iconeUsuario} alt="Usuário" />}
           </div>
         ))}
+
+        {/* 👇 AQUI: bolha de “Lupita está verificando...” enquanto carrega */}
+  {carregando && (
+    <div className="chat-content assistente">
+      <img src={lupita} alt="Lupita" />
+      <div className="balao-chat">
+        <div className="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  )}
       </main>
 
       {/* Caixa onde o usuário escreve e envia mensagens */}
