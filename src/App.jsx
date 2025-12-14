@@ -16,8 +16,8 @@ import { gerarId } from "./utils/chatUtils";
 import "./App.css";
 
 // URL base do backend (onde está o endpoint de verificação)
-/* const URL_BASE = "http://localhost:8000";  */
-const URL_BASE = "https://falando-de-fato-backend-production.up.railway.app"
+const URL_BASE = "http://localhost:8000";
+/* const URL_BASE = "https://falando-de-fato-backend-production.up.railway.app" */
 
 // Flag para usar mock de conversas (frontend-only) ou o backend real
 const USAR_MOCK_CONVERSAS = false;
@@ -193,100 +193,100 @@ export default function App() {
 
   // --- Envia mensagem do usuário: faz mock ou chama o backend ---
   // --- Envia mensagem do usuário: faz mock ou chama o backend ---
-async function handleEnviarDoUsuario(texto) {
-  // primeiro adiciona a bolha do usuário na conversa
-  adicionarMensagemNaConversaAtual("user", texto);
+  async function handleEnviarDoUsuario(texto) {
+    // primeiro adiciona a bolha do usuário na conversa
+    adicionarMensagemNaConversaAtual("user", texto);
 
-  // 👉 coloca a Lupita em "modo carregando"
-  setCarregando(true);
+    // 👉 coloca a Lupita em "modo carregando"
+    setCarregando(true);
 
-  if (USAR_MOCK_CONVERSAS) {
-    // se estiver usando mock, simula uma resposta da assistente
-    setTimeout(() => {
-      // quando "chegar" a resposta, para de carregar
-      setCarregando(false);
+    if (USAR_MOCK_CONVERSAS) {
+      // se estiver usando mock, simula uma resposta da assistente
+      setTimeout(() => {
+        // quando "chegar" a resposta, para de carregar
+        setCarregando(false);
 
-      adicionarMensagemNaConversaAtual(
-        "assistant",
-        "Vou verificar essa notícia pra você!"
-      );
-    }, 800); // atraso artificial para parecer mais natural
-    return; // termina aqui em modo mock
-  }
-
-  // ======================
-  // MODO BACKEND REAL
-  // ======================
-  try {
-    console.log("📤 Enviando para o backend:", texto);
-    // chama o endpoint /verificar do backend enviando o texto/ prompt
-    const res = await fetch(`${URL_BASE}/verificar`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({ prompt: texto }),
-      mode: "cors"
-    });
-
-    console.log("📥 Status da resposta:", res.status);
-
-    // Verifica se a resposta é OK
-    if (!res.ok) {
-      throw new Error(`Erro ${res.status}: ${res.statusText}`);
+        adicionarMensagemNaConversaAtual(
+          "assistant",
+          "Vou verificar essa notícia pra você!"
+        );
+      }, 800); // atraso artificial para parecer mais natural
+      return; // termina aqui em modo mock
     }
 
-    const data = await res.json(); // parse do JSON retornado
-    console.log("✅ Dados recebidos do backend:", data);
+    // ======================
+    // MODO BACKEND REAL
+    // ======================
+    try {
+      console.log("📤 Enviando para o backend:", texto);
+      // chama o endpoint /verificar do backend enviando o texto/ prompt
+      const res = await fetch(`${URL_BASE}/verificar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ prompt: texto }),
+        mode: "cors"
+      });
 
-    // 👉 chegou resposta, para o "carregando"
-    setCarregando(false);
+      console.log("📥 Status da resposta:", res.status);
 
-    // monta uma resposta formatada a partir dos campos retornados
-    const respostaFormatada = (
-      <div className="lupita-resposta">
-        <p className="lupita-resposta__classificacao">
-          <strong>Classificação:</strong> {data.classificacao}
-        </p>
-        <p className="lupita-resposta__resumo">
-          <strong>Resumo:</strong> {data.resumo}
-        </p>
-        <p className="lupita-resposta__fonte">
-          <strong>Fonte:</strong> {data.fonte}
-        </p>
-        <p className="lupita-resposta__data">
-          <strong>Data da notícia:</strong> {data.dataNoticia}
-        </p>
-      </div>
-    );
+      // Verifica se a resposta é OK
+      if (!res.ok) {
+        throw new Error(`Erro ${res.status}: ${res.statusText}`);
+      }
 
-    // adiciona a resposta da Lupita na conversa
-    adicionarMensagemNaConversaAtual("assistant", respostaFormatada);
-  } catch (error) {
-    console.error("❌ Erro na requisição:", error);
+      const data = await res.json(); // parse do JSON retornado
+      console.log("✅ Dados recebidos do backend:", data);
 
-    // 👉 em caso de erro, também para de carregar
-    setCarregando(false);
+      // 👉 chegou resposta, para o "carregando"
+      setCarregando(false);
 
-    // Mensagem de erro mais informativa
-    const mensagemErro = (
-      <div className="erro-resposta">
-        <p>⚠️ <strong>Erro ao verificar notícia:</strong></p>
-        <p>{error.message}</p>
-        <p className="dica-erro">
-          <small>
-            Verifique se:<br />
-            1. O servidor está rodando em {URL_BASE}<br />
-            2. Não há erros no console do backend
-          </small>
-        </p>
-      </div>
-    );
+      // monta uma resposta formatada a partir dos campos retornados
+      const respostaFormatada = (
+        <div className="lupita-resposta">
+          <p className="lupita-resposta__classificacao">
+            <strong>Classificação:</strong> {data.classificacao}
+          </p>
+          <p className="lupita-resposta__resumo">
+            <strong>Resumo:</strong> {data.resumo}
+          </p>
+          <p className="lupita-resposta__fonte">
+            <strong>Fonte:</strong> {data.fonte}
+          </p>
+          <p className="lupita-resposta__data">
+            <strong>Data da notícia:</strong> {data.dataNoticia}
+          </p>
+        </div>
+      );
 
-    adicionarMensagemNaConversaAtual("assistant", mensagemErro);
+      // adiciona a resposta da Lupita na conversa
+      adicionarMensagemNaConversaAtual("assistant", respostaFormatada);
+    } catch (error) {
+      console.error("❌ Erro na requisição:", error);
+
+      // 👉 em caso de erro, também para de carregar
+      setCarregando(false);
+
+      // Mensagem de erro mais informativa
+      const mensagemErro = (
+        <div className="erro-resposta">
+          <p>⚠️ <strong>Erro ao verificar notícia:</strong></p>
+          <p>{error.message}</p>
+          <p className="dica-erro">
+            <small>
+              Verifique se:<br />
+              1. O servidor está rodando em {URL_BASE}<br />
+              2. Não há erros no console do backend
+            </small>
+          </p>
+        </div>
+      );
+
+      adicionarMensagemNaConversaAtual("assistant", mensagemErro);
+    }
   }
-}
 
   // pega o objeto da conversa atualmente selecionada (ou null)
   const conversaAtual =
@@ -328,7 +328,7 @@ async function handleEnviarDoUsuario(texto) {
             ☰
           </button>
 
-          <div className="logo">
+          <div className="logo" onClick={() => window.location.href = "https://falando-de-fato-ten.vercel.app/"}>
             {/* logo de check */}
             <img src={CheckLogo} alt="Logo" />
             <h1>
