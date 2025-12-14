@@ -16,7 +16,7 @@ import { gerarId } from "./utils/chatUtils";
 import "./App.css";
 
 // URL base do backend (onde está o endpoint de verificação)
-/* const URL_BASE = "http://localhost:8000"; */
+/* const URL_BASE = "http://localhost: 8000"; */
 const URL_BASE = "https://falando-de-fato-backend-production.up.railway.app"
 
 // Flag para usar mock de conversas (frontend-only) ou o backend real
@@ -288,9 +288,66 @@ export default function App() {
     }
   }
 
+// ===============================
+// CADASTRO
+// ===============================
+async function handleCadastro(nome, email, senha) {
+  const formData = new FormData();
+  formData.append("nome", nome);
+  formData.append("email", email);
+  formData.append("senha", senha);
+
+  try {
+    const res = await fetch(`${URL_BASE}/auth/cadastro`, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Erro no cadastro");
+    }
+
+    const data = await res.json();
+    console.log("✅ Cadastro realizado:", data);
+  } catch (err) {
+    console.error("❌ Erro no cadastro:", err.message);
+  }
+}
+
+// ===============================
+// LOGIN
+// ===============================
+async function handleLogin(email, senha) {
+  const formData = new FormData();
+  formData.append("email", email);
+  formData.append("senha", senha);
+
+  try {
+    const res = await fetch(`${URL_BASE}/auth/login`, {
+      method: "POST",
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || "Erro no login");
+    }
+
+    const data = await res.json();
+    localStorage.setItem("token", data.access_token);
+    console.log("✅ Login realizado");
+  } catch (err) {
+    console.error("❌ Erro no login:", err.message);
+  }
+}
+
+
   // pega o objeto da conversa atualmente selecionada (ou null)
   const conversaAtual =
     conversas.find((c) => c.id === conversaSelecionadaId) || null;
+
+
 
   // --- JSX retornado pelo componente ---
   return (
