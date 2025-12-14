@@ -4,7 +4,6 @@
 import lupita from "../img/lupita.png";
 import iconeUsuario from "../img/iconeUsuario.png";
 import iconeEnvio from "../img/iconeEnvio.png";
-import { getAvatarLocal } from "../utils/avatarLocal";
 
 // Importa React e hooks necessários
 import React, { useEffect, useRef } from "react";
@@ -45,16 +44,6 @@ export default function MainContent({ conversa, onEnviar, campoRef, carregando }
     }
   }
 
-  const guestId =
-    localStorage.getItem("guestId") ||
-    (() => {
-      const id = crypto.randomUUID();
-      localStorage.setItem("guestId", id);
-      return id;
-    })();
-
-
-
   return (
     <>
       {/* Área principal onde as mensagens aparecem */}
@@ -63,12 +52,13 @@ export default function MainContent({ conversa, onEnviar, campoRef, carregando }
         {(conversa?.messages || []).map((msg, i) => (
           <div
             key={i}
-            className={`chat-content ${msg.role === "user"
-              ? "usuario"
-              : msg.role === "assistant"
+            className={`chat-content ${
+              msg.role === "user"
+                ? "usuario"
+                : msg.role === "assistant"
                 ? "assistente"
                 : "sistema"
-              }`}
+            }`}
           >
             {/* Ícone da Lupita aparece antes da mensagem da assistente */}
             {msg.role === "assistant" && <img src={lupita} alt="Lupita" />}
@@ -79,29 +69,21 @@ export default function MainContent({ conversa, onEnviar, campoRef, carregando }
             </div>
 
             {/* Ícone do usuário aparece depois da mensagem do usuário */}
-            {msg.role === "user" && (
-              <img
-                src={getAvatarLocal(guestId)}
-                alt="Usuário"
-                className="avatar-usuario"
-              />
-            )}
-
-
+            {msg.role === "user" && <img src={iconeUsuario} alt="Usuário" />}
           </div>
         ))}
 
         {/* 👇 AQUI: bolha de “Lupita está verificando...” enquanto carrega */}
-        {carregando && (
-          <div className="chat-content assistente">
-            <img src={lupita} alt="Lupita" />
-            <div className="balao-chat">
-              <div className="typing-indicator">
-                <span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
-        )}
+  {carregando && (
+    <div className="chat-content assistente">
+      <img src={lupita} alt="Lupita" />
+      <div className="balao-chat">
+        <div className="typing-indicator">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+  )}
       </main>
 
       {/* Caixa onde o usuário escreve e envia mensagens */}
